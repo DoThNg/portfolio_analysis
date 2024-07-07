@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import pandas as pd
 from scipy.optimize import minimize
 import numpy as np
+from datetime import datetime, timedelta
 
 st.set_page_config(layout="wide", page_title="Portfolio Construction", initial_sidebar_state = "expanded", page_icon=":sparkles:")
 
@@ -28,7 +29,9 @@ with st.sidebar:
     option = st.selectbox("Would you like the portfolio to be equally weighted? Only applicable when the csv file containing portfolio is uploaded. :clipboard:",
                         ("Yes", "No"))
     port = st.file_uploader("Please choose a csv file containing a list of stock tickers and allocation percentage :file_folder:")
-
+    start_date = st.sidebar.date_input("Start Date :date:", datetime.today() - timedelta(days=90))
+    end_date = st.sidebar.date_input("End Date :date:", datetime.today())
+        
 template = dict(
                 layout=go.Layout(title_font=dict(family="Rockwell", size=28))
             )
@@ -118,7 +121,7 @@ if port is not None:
             
             # Layout
             fig2.update_layout(
-                title_text="Portfolio and Benchmark performances",
+                title_text="Portfolio and Benchmark performances from {} to {}".format(start_date, end_date),
                 width = 1200, height = 500,
                 template = template
             )
@@ -130,13 +133,13 @@ if port is not None:
 
     # Calculate CAGR
     star_port_value = port["CumulativeReturns"][1]
-    end__port_value = port["CumulativeReturns"][len(port["CumulativeReturns"]) - 1]
+    end_port_value = port["CumulativeReturns"][len(port["CumulativeReturns"]) - 1]
 
     star_bm_value = benchmark_price_data["CumulativeReturns"][1]
-    end__bm_value = benchmark_price_data["CumulativeReturns"][len(benchmark_price_data["CumulativeReturns"]) - 1]
+    end_bm_value = benchmark_price_data["CumulativeReturns"][len(benchmark_price_data["CumulativeReturns"]) - 1]
 
-    cagr_portfolio = round(((end__port_value/star_port_value)**(1/((end_date-start_date).days/365)) - 1) * 100, 2)
-    cagr_benchmark = round(((end__bm_value/star_bm_value)**(1/((end_date-start_date).days/365)) - 1) * 100, 2)
+    cagr_portfolio = round(((end_port_value/star_port_value)**(1/((end_date-start_date).days/365)) - 1) * 100, 2)
+    cagr_benchmark = round(((end_bm_value/star_bm_value)**(1/((end_date-start_date).days/365)) - 1) * 100, 2)
 
     # The tracking error
     tracking_err = round((np.std(port["Portfolio"] - benchmark_price_data["R_Benchmark"]) * np.sqrt(252) * 100), 2)
