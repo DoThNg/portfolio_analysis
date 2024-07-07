@@ -5,7 +5,6 @@ import plotly.graph_objects as go
 import pandas as pd
 from scipy.optimize import minimize
 import numpy as np
-from datetime import datetime, timedelta
 
 st.set_page_config(layout="wide", page_title="Portfolio Construction", initial_sidebar_state = "expanded", page_icon=":sparkles:")
 
@@ -13,284 +12,30 @@ st.title("Equity Portfolio Construction :telescope:")
 st.write("""
         This is an interactive dashboard app built in Python with the stock data deriving from Yahoo Finance.
          
-        In general, this app can be used for the following analysis:
-         
-         1. The quantitative and fundamental of a stock
-         2. The analysis of a select portfolio
+        This app can be used for analysis of a selected equity portfolio.
 
         **Note**: The sidebar on the left of the dashboard app is for the user inputs
          
         **Disclaimer:**
-         This app is only for learning to build and deploy a Streamlit App. Any information or analysis in this app is not an investment advice and should not be relied upon in any investment decisions. Please be also noted that past performance information is given for illustrative purposes only, and it is not an indication of future performance. In addition, many factors (e.g., transaction fees, capital gain tax, investment risks, etc.) have not been taken into account in the stock or portfolio analysis and it will, therefore, not be applicable to an individual's objectives or financial situation.
+         This app is only for learning to build and deploy a Streamlit App. Any information or analysis in this app is not an investment advice and should not be relied upon in any investment decisions. Please be also noted that past performance information is given for illustrative purposes only, and it is not an indication of future performance. In addition, many factors (e.g., transaction fees, capital gain tax, investment risks, etc.) have not been taken into account in the portfolio analysis and it will, therefore, not be applicable to an individual's objectives or financial situation.
         """)
 
 st.divider()
 
 with st.sidebar:
     st.write("Please be noted to add stock exchange after the stock ticker. For example: Commonwealth Bank (CBA.AX), or Telstra (TLS.AX)")
-    ticker = st.sidebar.text_input("Stock Ticker - Yahoo Finance :coffee:", "TLS.AX")
     benchmark_ticker = st.sidebar.text_input("Benchmark Ticker - Yahoo Finance :green_book:", "^AXJO")
     rf = st.sidebar.text_input("Risk Free Rate :chart_with_upwards_trend:", 0.02)
     option = st.selectbox("Would you like the portfolio to be equally weighted? Only applicable when the csv file containing portfolio is uploaded. :clipboard:",
                         ("Yes", "No"))
     port = st.file_uploader("Please choose a csv file containing a list of stock tickers and allocation percentage :file_folder:")
-    start_date = st.sidebar.date_input("Start Date :date:", datetime.today() - timedelta(days=90))
-    end_date = st.sidebar.date_input("End Date :date:", datetime.today())
 
 template = dict(
                 layout=go.Layout(title_font=dict(family="Rockwell", size=28))
             )
 
-st.header("1. The quantitative and fundamental of a stock")
-
-col1, col2 = st.columns(2)
-
-if ticker:
-    try:
-        with col1:
-            st.subheader("Stock price performances :signal_strength:")
-            stock_price_data = yf.download(ticker, period = '5y')
-            benchmark_price_data = yf.download(benchmark_ticker, period = '5y')
-
-            fig = go.Figure()
-            fig.add_trace(go.Scatter(x = stock_price_data.index, y = stock_price_data['Adj Close'], name = "Stock prices", yaxis='y'))
-            fig.add_trace(go.Scatter(x = benchmark_price_data.index, y = benchmark_price_data['Adj Close'], name = "Benchmark", yaxis='y2'))
-
-            # Create axis objects
-            fig.update_layout(xaxis=dict(domain=[0.1, 0.99]),
-                            
-                yaxis=dict(
-                    title="Stock prices",
-                    titlefont=dict(color="#1f77b4"),
-                    tickfont=dict(color="#1f77b4")),
-                                              
-                yaxis2=dict(title="Benchmark",overlaying="y",
-                            side="right",position=0.98))
-            
-            # title
-            fig.update_layout(
-                title_text="Stock prices: {} vs. Benchmark: {}".format(ticker, benchmark_ticker),
-                width=800,
-                template = template
-            )
-
-            st.plotly_chart(fig)
-
-            fundamentals_IC, fundamentals_BS, fundamentals_CF = st.tabs(["Income Statement", "Balance Sheet", "Cashflow Statement"])
-            
-            comp_data = yf.Ticker(ticker = ticker)
-
-            with fundamentals_IC:
-                st.header("Income Statement")
-                st.write(comp_data.financials)
-
-            with fundamentals_BS:
-                st.header("Balance Sheet")
-                st.write(comp_data.balancesheet)
-
-            with fundamentals_CF:
-                st.header("Cash Flow")
-                st.write(comp_data.cashflow)
-
-    except Exception as error:
-        st.text("Error found: {}".format(error))
-
-    with col2:
-        st.subheader("Fundamental Metrics :books:")
-
-        comp = yf.Ticker(ticker)
-        avg_price = yf.download(ticker, period="5d")['Adj Close'].mean()
-
-        cf = comp.cashflow
-        bs = comp.balancesheet
-        ic = comp.financials
-
-        try:
-            if ".AX" in ticker:
-                operating_cf = cf.loc["Cash Flowsfromusedin Operating Activities Direct"]
-                investing_cf = cf.loc["Cash Flow From Continuing Investing Activities"]
-
-                for ops_cf_idx in range(len(operating_cf)):
-                    if np.isnan(operating_cf[ops_cf_idx]):
-                        operating_cf[ops_cf_idx] = 0
-                    if np.isnan(investing_cf[ops_cf_idx]):
-                        investing_cf[ops_cf_idx] = 0
-                ops_cf = operating_cf + investing_cf
-
-            else:
-                operating_cf = cf.loc["Cash Flow From Continuing Operating Activities"]
-                investing_cf = cf.loc["Cash Flow From Continuing Investing Activities"]
-
-                for ops_cf_idx in range(len(operating_cf)):
-                    if np.isnan(operating_cf[ops_cf_idx]):
-                        operating_cf[ops_cf_idx] = 0
-                    if np.isnan(investing_cf[ops_cf_idx]):
-                        investing_cf[ops_cf_idx] = 0
-                ops_cf = operating_cf + investing_cf
-                
-            # cashflow per share
-            cf_per_share = ops_cf / ic.loc["Diluted Average Shares"]
-
-            price_to_cf_list = avg_price/cf_per_share 
-
-            idx = 0
-            for n_yr in price_to_cf_list.index:
-                fin_yr = datetime.strftime(n_yr, '%Y')
-                curr_yr = datetime.today().strftime('%Y')
-                if fin_yr == curr_yr:
-                    price_to_cf = price_to_cf_list.iloc[idx]
-                elif fin_yr == str(int(curr_yr) - 1):
-                    price_to_cf = price_to_cf_list.iloc[idx]
-                idx = idx + 1
-
-            st.write("1. Price to Cashflow")
-            st.write("Note: Cashflow = Ops CF - CAPEX (or Investing CF)")
-            st.write("P/CF where CF is in the most recent annual report")
-            st.write(round(price_to_cf, 2))
-
-            st.write("P/CF where CF is the average of historical CFs")
-            st.write(round(avg_price/(cf_per_share).mean(), 2)) 
-
-        except:
-            st.write("1. Price to Cashflow")
-            st.write("Note: Cashflow = Ops CF - CAPEX (or Investing CF)")
-            st.write("There is no data on P/CF for {}".format(ticker))
-                    
-        try:
-            EPS = ic.loc["Diluted EPS"]
-            PE_ratio = avg_price/EPS.iloc[0]
-
-            st.write("2. Current PE Ratio")
-            st.write("Note: diluted shares are consider to compute PE")
-            st.write(round(PE_ratio, 2))
-        except:       
-            st.write("2. Current PE Ratio")
-            st.write("Note: diluted shares are consider to compute PE")
-            st.write("There is no data on PE ratio for {}".format(ticker))               
-
-
-        debt_ratio, return_on_equity, return_on_assets = st.tabs(["3. Net Debt to Equity", "4. ROE Ratio", "5. ROA Ratio"])
-
-        # Net Debt / Equity
-        with debt_ratio:
-            try:
-                st.write("3. Net Debt to Equity") 
-                try:
-                    long_term_debt = bs.loc["Long Term Debt And Capital Lease Obligation"].fillna(0)
-                except:
-                    long_term_debt = 0
-
-                try:
-                    cur_debt_cap_lease = bs.loc["Current Debt And Capital Lease Obligation"].fillna(0)
-                except:
-                    cur_debt_cap_lease = 0
-
-                try:
-                    other_cur_bor = bs.loc["Other Current Borrowings"].fillna(0)
-                except:
-                    other_cur_bor = 0
-
-                try:
-                    non_cur_pen = bs.loc["Non Current Pension And Other Postretirement Benefit Plans"].fillna(0)
-                except:
-                    non_cur_pen = 0
-
-                try:
-                    other_post_ret = bs.loc["Pensionand Other Post Retirement Benefit Plans Current"].fillna(0)
-                except:
-                    other_post_ret = 0
-
-                comp_net_debt = long_term_debt + cur_debt_cap_lease + other_cur_bor + non_cur_pen + other_post_ret - bs.loc["Cash And Cash Equivalents"]
-                historical_debt_ratio = pd.DataFrame(comp_net_debt / bs.loc["Stockholders Equity"])
-
-                historical_debt_ratio.columns = ["Net Debt Ratio"]
-                historical_debt_ratio.index.name = "Date"
-                debt_ratio_chart = px.line(historical_debt_ratio, x = historical_debt_ratio.index, y = historical_debt_ratio["Net Debt Ratio"], title = "Net Debt to Equity Ratio")
-                st.plotly_chart(debt_ratio_chart)
-
-            except:
-                st.write("3. Net Debt to Equity")
-                st.write("There is no data on Net Debt-to-Equity for {}".format(ticker))   
-
-        
-        with return_on_equity:
-            st.write("4. ROE Ratio")
-            try:
-                roe = pd.DataFrame((ic.loc["Net Income Common Stockholders"] / bs.loc["Stockholders Equity"]) * 100)
-                roe.columns = ["ROE, %"]
-                roe.index.name = "Date"
-                roe_chart = px.line(roe, x = roe.index, y = roe["ROE, %"], title = "ROE Ratio, %")
-                st.plotly_chart(roe_chart)
-
-            except:       
-                st.write("There is no data on ROE for {}".format(ticker))   
-
-        with return_on_assets:
-            st.write("5. ROA Ratio")
-            try:
-                roa = pd.DataFrame((ic.loc["Net Income Common Stockholders"] / bs.loc["Total Assets"]) * 100)
-                roa.columns = ["ROA, %"]
-                roa.index.name = "Date"
-                roa_chart = px.line(roa, x = roa.index, y = roa["ROA, %"], title = "ROA Ratio, %")
-                st.plotly_chart(roa_chart)
-
-            except:       
-                st.write("There is no data on ROA for {}".format(ticker))  
-        
-        st.write("6. Cashflow Overview")
-        try:
-            if ".AX" in ticker:
-                fig_ax = go.Figure()
-                fig_ax.add_trace(go.Scatter(x = cf.loc["Cash Flowsfromusedin Operating Activities Direct"].index, y = cf.loc["Cash Flowsfromusedin Operating Activities Direct"], name = "Ops Cashflow", yaxis='y'))
-                fig_ax.add_trace(go.Scatter(x = cf.loc["Cash Flow From Continuing Investing Activities"].index, y = cf.loc["Cash Flow From Continuing Investing Activities"] * -1, name = "Investing Cashflow", yaxis='y2'))
-
-                # Create axis objects
-                fig_ax.update_layout(xaxis=dict(domain=[0.1, 0.99]),
-            
-                    yaxis=dict(
-                        title="Operating CF",
-                        titlefont=dict(color="#1f77b4"),
-                        tickfont=dict(color="#1f77b4")),
-                                  
-                    yaxis2=dict(title="Investing CF",overlaying="y",
-                                side="right",position=0.98))
-                
-                # title
-                fig_ax.update_layout(
-                    title_text="Cashflow Overview: {}".format(ticker),
-                    width=800,
-                    template = template
-                )
-                st.plotly_chart(fig_ax)
-
-            else:
-                fig_non_ax = go.Figure()
-                fig_non_ax.add_trace(go.Scatter(x = cf.loc["Cash Flow From Continuing Operating Activities"].index, y = cf.loc["Cash Flow From Continuing Operating Activities"], name = "Ops Cashflow", yaxis='y'))
-                fig_non_ax.add_trace(go.Scatter(x = cf.loc["Cash Flow From Continuing Investing Activities"].index, y = cf.loc["Cash Flow From Continuing Investing Activities"] * -1, name = "Investing Cashflow", yaxis='y2'))
-
-                # Create axis objects
-                fig_non_ax.update_layout(xaxis=dict(domain=[0.1, 0.99]),          
-                    yaxis=dict(
-                        title="Operating CF",
-                        titlefont=dict(color="#1f77b4"),
-                        tickfont=dict(color="#1f77b4")),
-                                
-                    yaxis2=dict(title="Investing CF",overlaying="y",
-                                side="right",position=0.98))
-                
-                # title
-                fig_non_ax.update_layout(
-                    title_text="Cashflow Overview: {}".format(ticker),
-                    width=800,
-                    template = template
-                )
-
-                st.plotly_chart(fig_non_ax)
-        except:
-                st.write("There is no historical data on Cashflow for {}".format(ticker))                  
-
 st.divider()
-st.header("2. The portfolio analysis")
+st.header("The portfolio analysis")
 st.write("""
             
         ###### Note: In the sidebar, please drag and drop the csv file with the following format:
