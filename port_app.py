@@ -214,8 +214,8 @@ if ticker:
 
         
         with return_on_equity:
+            st.write("4. ROE Ratio")
             try:
-                st.write("4. ROE Ratio")
                 roe = pd.DataFrame((ic.loc["Net Income Common Stockholders"] / bs.loc["Stockholders Equity"]) * 100)
                 roe.columns = ["ROE, %"]
                 roe.index.name = "Date"
@@ -223,12 +223,11 @@ if ticker:
                 st.plotly_chart(roe_chart)
 
             except:       
-                st.write("4. ROE Ratio")
                 st.write("There is no data on ROE for {}".format(ticker))   
 
         with return_on_assets:
+            st.write("5. ROA Ratio")
             try:
-                st.write("5. ROA Ratio")
                 roa = pd.DataFrame((ic.loc["Net Income Common Stockholders"] / bs.loc["Total Assets"]) * 100)
                 roa.columns = ["ROA, %"]
                 roa.index.name = "Date"
@@ -236,11 +235,10 @@ if ticker:
                 st.plotly_chart(roa_chart)
 
             except:       
-                st.write("5. ROA Ratio")
                 st.write("There is no data on ROA for {}".format(ticker))  
         
+        st.write("6. Cashflow Overview")
         try:
-            st.write("6. Cashflow Overview")
             if ".AX" in ticker:
                 fig_ax = go.Figure()
                 fig_ax.add_trace(go.Scatter(x = cf.loc["Cash Flowsfromusedin Operating Activities Direct"].index, y = cf.loc["Cash Flowsfromusedin Operating Activities Direct"], name = "Ops Cashflow", yaxis='y'))
@@ -289,7 +287,6 @@ if ticker:
 
                 st.plotly_chart(fig_non_ax)
         except:
-                st.write("6. Cashflow Overview")
                 st.write("There is no historical data on Cashflow for {}".format(ticker))                  
 
 st.divider()
