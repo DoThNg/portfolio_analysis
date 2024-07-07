@@ -57,7 +57,7 @@ st.write("""
         """)
 st.write("---")
 
-benchmark_price_data = yf.download(benchmark_ticker, start = start_date, end = end_date)
+benchmark_price_data = yf.download(benchmark_ticker, period = str((end_date-start_date).days/365) + "y")
 
 col3, col4 = st.columns([0.3, 0.7])
 
@@ -76,7 +76,7 @@ if port is not None:
             for idx in range(len(df["Ticker"])):
                 ticker = df["Ticker"].iloc[idx]
 
-                stock_data = yf.download(ticker, start = start_date, end = end_date)
+                stock_data = yf.download(ticker, period = str((end_date-start_date).days/365) + "y")
                 stock_price = stock_data['Adj Close']
                 port_list.append(stock_price)
 
