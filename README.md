@@ -1,6 +1,7 @@
 ### Portfolio Analysis Application
 
 **Disclaimer**: 
+
 This app is only for learning to build and deploy a Streamlit App. Any information or analysis in this app is not an investment advice and should not be relied upon in any investment decisions. Please be also noted that past performance information is given for illustrative purposes only, and it is not an indication of future performance. In addition, many factors (e.g., transaction fees, capital gain tax, investment risks, etc.) have not been taken into account in the portfolio analysis and it will, therefore, not be applicable to an individual's objectives or financial situation.
 
 This is an interactive Streamlit App built in Python with the stock data deriving from Yahoo Finance.
