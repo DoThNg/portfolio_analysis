@@ -9,8 +9,6 @@ This app can be used for analysis of a selected equity portfolio over the past 5
 ![portfolio_app](https://github.com/DoThNg/portfolio_analysis/blob/main/portfolio_app.png)
 
 **Note**: In the sidebar, please drag and drop the csv file with the following format:
-        
-        **Example**: 
 
         | Ticker          | Allocation    |
         | --------------- | ------------- |
@@ -21,7 +19,7 @@ In column **Ticker**, please add stock exchange (e.g., **.AX** for Australian St
             
 For column **Allocation**, the sum of allocations is **1.0**
 
-For furthere reference, please review this [following stocks.csv](https://github.com/DoThNg/portfolio_analysis/blob/main/stocks.csv)
+For furthere reference, please review this following [stocks.csv](https://github.com/DoThNg/portfolio_analysis/blob/main/stocks.csv)
 
 The S&P/ASX 200 (^AXJO) is set as the benchmark for portfolio analysis. However, the benchmark can be changed in the sidebar to any others. 
             
