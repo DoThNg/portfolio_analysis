@@ -49,8 +49,8 @@ if ticker:
     try:
         with col1:
             st.subheader("Stock price performances :signal_strength:")
-            stock_price_data = yf.download(ticker, start = start_date, end = end_date)
-            benchmark_price_data = yf.download(benchmark_ticker, start = start_date, end = end_date)
+            stock_price_data = yf.download(ticker, period = '5y')
+            benchmark_price_data = yf.download(benchmark_ticker, period = '5y')
 
             fig = go.Figure()
             fig.add_trace(go.Scatter(x = stock_price_data.index, y = stock_price_data['Adj Close'], name = "Stock prices", yaxis='y'))
@@ -103,7 +103,7 @@ if ticker:
         start_price_date = start_price_date.strftime('%Y-%m-%d')
         end_price_date = datetime.today().strftime('%Y-%m-%d')
 
-        avg_price = yf.download(ticker, start_price_date, end_price_date)['Adj Close'].mean()
+        avg_price = yf.download(ticker, period = '5y')['Adj Close'].mean()
 
         cf = comp.cashflow
         bs = comp.balancesheet
@@ -335,7 +335,7 @@ if port is not None:
             for idx in range(len(df["Ticker"])):
                 ticker = df["Ticker"].iloc[idx]
 
-                stock_data = yf.download(ticker, start = start_date, end = end_date)
+                stock_data = yf.download(ticker, period = '5y')
                 stock_price = stock_data['Adj Close']
                 port_list.append(stock_price)
 
