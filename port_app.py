@@ -290,7 +290,7 @@ if ticker:
                 st.plotly_chart(fig_non_ax)
         except:
                 st.write("6. Cashflow Overview")
-                st.write("There is no historical ata on Cashflow for {}".format(ticker))                  
+                st.write("There is no historical data on Cashflow for {}".format(ticker))                  
 
 st.divider()
 st.header("2. The portfolio analysis")
