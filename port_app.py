@@ -5,7 +5,6 @@ import plotly.graph_objects as go
 import pandas as pd
 from scipy.optimize import minimize
 import numpy as np
-from datetime import datetime, timedelta
 
 st.set_page_config(layout="wide", page_title="Portfolio Construction", initial_sidebar_state = "expanded", page_icon=":sparkles:")
 
@@ -29,8 +28,9 @@ with st.sidebar:
     option = st.selectbox("Would you like the portfolio to be equally weighted? Only applicable when the csv file containing portfolio is uploaded. :clipboard:",
                         ("Yes", "No"))
     port = st.file_uploader("Please choose a csv file containing a list of stock tickers and allocation percentage :file_folder:")
-    start_date = st.sidebar.date_input("Start Date :date:", datetime.today() - timedelta(days=90))
-    end_date = st.sidebar.date_input("End Date :date:", datetime.today())
+        
+    start_date = st.sidebar.date_input("Start Date :date:")
+    end_date = st.sidebar.date_input("End Date :date:")
         
 template = dict(
                 layout=go.Layout(title_font=dict(family="Rockwell", size=28))
