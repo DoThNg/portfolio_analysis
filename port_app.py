@@ -28,10 +28,7 @@ with st.sidebar:
     option = st.selectbox("Would you like the portfolio to be equally weighted? Only applicable when the csv file containing portfolio is uploaded. :clipboard:",
                         ("Yes", "No"))
     port = st.file_uploader("Please choose a csv file containing a list of stock tickers and allocation percentage :file_folder:")
-        
-    start_date = st.sidebar.date_input("Start Date :date:")
-    end_date = st.sidebar.date_input("End Date :date:")
-        
+                
 template = dict(
                 layout=go.Layout(title_font=dict(family="Rockwell", size=28))
             )
@@ -57,7 +54,7 @@ st.write("""
         """)
 st.write("---")
 
-benchmark_price_data = yf.download(benchmark_ticker, period = str((end_date-start_date).days/365) + "y")
+benchmark_price_data = yf.download(benchmark_ticker, period = "5y")
 
 col3, col4 = st.columns([0.3, 0.7])
 
@@ -76,7 +73,7 @@ if port is not None:
             for idx in range(len(df["Ticker"])):
                 ticker = df["Ticker"].iloc[idx]
 
-                stock_data = yf.download(ticker, period = str((end_date-start_date).days/365) + "y")
+                stock_data = yf.download(ticker, period = "5y")
                 stock_price = stock_data['Adj Close']
                 port_list.append(stock_price)
 
@@ -121,7 +118,7 @@ if port is not None:
             
             # Layout
             fig2.update_layout(
-                title_text="Portfolio and Benchmark performances from {} to {}".format(start_date, end_date),
+                title_text="Portfolio and Benchmark performances from {} to {}".format(datetime.today() - relativedelta(years=5), datetime.today()),
                 width = 1200, height = 500,
                 template = template
             )
