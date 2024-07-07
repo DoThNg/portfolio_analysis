@@ -107,20 +107,18 @@ if port is not None:
             fig2.add_trace(go.Scatter(x = benchmark_price_data.index, y = benchmark_price_data['CumulativeReturns'], name = "Benchmark", yaxis='y2'))
 
             # Create axis objects
-            fig2.update_layout(xaxis=dict(domain=[0.1, 0.99]),
-                #create 1st y axis              
+            fig2.update_layout(xaxis=dict(domain=[0.1, 0.99]),           
                 yaxis=dict(
                     title="Portoflio",
                     titlefont=dict(color="#1f77b4"),
                     tickfont=dict(color="#1f77b4")),
-                            
-                #create 2nd y axis       
+                     
                 yaxis2=dict(title="Benchmark", overlaying="y",
                             side="right", position=0.98))
             
             # Layout
             fig2.update_layout(
-                title_text="Portfolio and Benchmark performances from {} to {}".format(datetime.today() - relativedelta(years=5), datetime.today()),
+                title_text="Portfolio and Benchmark performances from {} to {}".format((datetime.today() - relativedelta(years=5)).strftime('%Y-%m-%d'), datetime.today().strftime('%Y-%m-%d')),
                 width = 1200, height = 500,
                 template = template
             )
@@ -137,8 +135,8 @@ if port is not None:
     star_bm_value = benchmark_price_data["CumulativeReturns"][1]
     end_bm_value = benchmark_price_data["CumulativeReturns"][len(benchmark_price_data["CumulativeReturns"]) - 1]
 
-    cagr_portfolio = round(((end_port_value/star_port_value)**(1/((end_date-start_date).days/365)) - 1) * 100, 2)
-    cagr_benchmark = round(((end_bm_value/star_bm_value)**(1/((end_date-start_date).days/365)) - 1) * 100, 2)
+    cagr_portfolio = round(((end_port_value/star_port_value)**(1/5 - 1) * 100, 2)
+    cagr_benchmark = round(((end_bm_value/star_bm_value)**(1/5 - 1) * 100, 2)
 
     # The tracking error
     tracking_err = round((np.std(port["Portfolio"] - benchmark_price_data["R_Benchmark"]) * np.sqrt(252) * 100), 2)
