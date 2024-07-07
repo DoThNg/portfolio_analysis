@@ -12,7 +12,7 @@ st.title("Equity Portfolio Construction :telescope:")
 st.write("""
         This is an interactive dashboard app built in Python with the stock data deriving from Yahoo Finance.
          
-        This app can be used for analysis of a selected equity portfolio.
+        This app can be used for analysis of a selected equity portfolio over the past 5 years.
 
         **Note**: The sidebar on the left of the dashboard app is for the user inputs
          
@@ -23,7 +23,6 @@ st.write("""
 st.divider()
 
 with st.sidebar:
-    st.write("Please be noted to add stock exchange after the stock ticker. For example: Commonwealth Bank (CBA.AX), or Telstra (TLS.AX)")
     benchmark_ticker = st.sidebar.text_input("Benchmark Ticker - Yahoo Finance :green_book:", "^AXJO")
     rf = st.sidebar.text_input("Risk Free Rate :chart_with_upwards_trend:", 0.02)
     option = st.selectbox("Would you like the portfolio to be equally weighted? Only applicable when the csv file containing portfolio is uploaded. :clipboard:",
@@ -34,7 +33,6 @@ template = dict(
                 layout=go.Layout(title_font=dict(family="Rockwell", size=28))
             )
 
-st.divider()
 st.header("The portfolio analysis")
 st.write("""
             
@@ -55,6 +53,8 @@ st.write("""
             
         """)
 st.write("---")
+
+benchmark_price_data = yf.download(benchmark_ticker, period = '5y')
 
 col3, col4 = st.columns([0.3, 0.7])
 
