@@ -27,7 +27,7 @@ st.divider()
 with st.sidebar:
     benchmark_ticker = st.sidebar.text_input("Benchmark Ticker - Yahoo Finance :green_book:", "^AXJO")
     rf = st.sidebar.text_input("Risk Free Rate :chart_with_upwards_trend:", 0.02)
-    option = st.selectbox("Would you like the portfolio to be equally weighted? Only applicable when the csv file containing portfolio is uploaded. :clipboard:",
+    option = st.selectbox("Would you like the portfolio to be always equally weighted? Only applicable when the csv file containing portfolio is uploaded. If 'No' selected, the portfolio performance will be based on the initial allocation percentage in the uploaded csv file. :clipboard:",
                         ("Yes", "No"))
     port = st.file_uploader("Please choose a csv file containing a list of stock tickers and allocation percentage :file_folder:")
                 
