@@ -99,11 +99,7 @@ if ticker:
         st.subheader("Fundamental Metrics :books:")
 
         comp = yf.Ticker(ticker)
-        start_price_date = datetime.today() - timedelta(days=7)
-        start_price_date = start_price_date.strftime('%Y-%m-%d')
-        end_price_date = datetime.today().strftime('%Y-%m-%d')
-
-        avg_price = yf.download(ticker, start_price_date, end_price_date)['Adj Close'].mean()
+        avg_price = yf.download(ticker, period="5d")['Adj Close'].mean()
 
         cf = comp.cashflow
         bs = comp.balancesheet
