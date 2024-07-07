@@ -135,8 +135,8 @@ if port is not None:
     star_bm_value = benchmark_price_data["CumulativeReturns"][1]
     end_bm_value = benchmark_price_data["CumulativeReturns"][len(benchmark_price_data["CumulativeReturns"]) - 1]
 
-    cagr_portfolio = round(((end_port_value/star_port_value)**(1/5 - 1) * 100, 2)
-    cagr_benchmark = round(((end_bm_value/star_bm_value)**(1/5 - 1) * 100, 2)
+    cagr_portfolio = round(((end_port_value/star_port_value)**(1/5) - 1) * 100, 2)
+    cagr_benchmark = round(((end_bm_value/star_bm_value)**(1/5) - 1) * 100, 2)
 
     # The tracking error
     tracking_err = round((np.std(port["Portfolio"] - benchmark_price_data["R_Benchmark"]) * np.sqrt(252) * 100), 2)
