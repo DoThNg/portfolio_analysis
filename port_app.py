@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import pandas as pd
 from scipy.optimize import minimize
 import numpy as np
-from datetime import datetime
+from datetime import datetime, relativedelta
 
 st.set_page_config(layout="wide", page_title="Portfolio Construction", initial_sidebar_state = "expanded", page_icon=":sparkles:")
 
