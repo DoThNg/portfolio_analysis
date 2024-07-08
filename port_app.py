@@ -155,8 +155,8 @@ if port is not None:
     sortino_ratio = round((rp - float(rf)) / down_stdev, 2)
     
     st.subheader("Portfolio Performance Summary")
-    st.dataframe(pd.DataFrame({"Portfolio Return, %" : cagr_portfolio,
-                  "Benchmark Return, %" : cagr_benchmark,
+    st.dataframe(pd.DataFrame({"Portfolio CAGR, %" : cagr_portfolio,
+                  "Benchmark CAGR, %" : cagr_benchmark,
                   "Tracking Error, %" : tracking_err,
                   "Max Drawdown, %" : mdd,
                   "Sharpe Ratio" : sharpe_ratio,
