@@ -118,7 +118,7 @@ if port is not None:
             
             # Layout
             fig2.update_layout(
-                title_text="Portfolio and Benchmark performances from {} to {}".format((datetime.today() - relativedelta(years=5)).strftime('%Y-%m-%d'), datetime.today().strftime('%Y-%m-%d')),
+                title_text="Portfolio and Benchmark performances (cumulative returns) from {} to {}".format((datetime.today() - relativedelta(years=5)).strftime('%Y-%m-%d'), datetime.today().strftime('%Y-%m-%d')),
                 width = 1200, height = 500,
                 template = template
             )
