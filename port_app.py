@@ -174,7 +174,7 @@ if port is not None:
             return opt_result
     
         # Weight constraint: sum of weights is equal to 1
-        constraint = {"type": "eq", "fun": lambda x: np.sum(x) = 1}
+        constraint = {"type": "eq", "fun": lambda x: np.sum(x) - 1}
         
         optimizer = minimize(opt_tracking_error, 
                              x0=[0.1 for i in range(len(df["Ticker"]))], 
