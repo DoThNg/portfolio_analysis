@@ -128,54 +128,61 @@ if port is not None:
     except Exception as error:
         st.text("Error found: {}".format(error)) 
 
-    # Calculate CAGR
-    star_port_value = port["CumulativeReturns"][1]
-    end_port_value = port["CumulativeReturns"][len(port["CumulativeReturns"]) - 1]
+    try:
+        # Calculate CAGR
+        star_port_value = port["CumulativeReturns"][1]
+        end_port_value = port["CumulativeReturns"][len(port["CumulativeReturns"]) - 1]
+        
+        star_bm_value = benchmark_price_data["CumulativeReturns"][1]
+        end_bm_value = benchmark_price_data["CumulativeReturns"][len(benchmark_price_data["CumulativeReturns"]) - 1]
+        
+        cagr_portfolio = round(((end_port_value/star_port_value)**(1/5) - 1) * 100, 2)
+        cagr_benchmark = round(((end_bm_value/star_bm_value)**(1/5) - 1) * 100, 2)
+        
+        # The tracking error
+        tracking_err = round((np.std(port["Portfolio"] - benchmark_price_data["R_Benchmark"]) * np.sqrt(252) * 100), 2)
+        
+        # Maximum Drawdown (MDD) = (Trough Value – Peak Value) ÷ Peak Value
+        mdd = round(((port["CumulativeReturns"].max() - port["CumulativeReturns"].min()) / port["CumulativeReturns"].max()) * 100, 2)
+        
+        # Calculate Sharpe Ratio
+        rp = round(port["Portfolio"].mean()*252, 3)
+        sharpe_ratio = round((rp - float(rf)) / (port["Portfolio"].std()*np.sqrt(252)), 3)
+            
+        # Calculate Sortino Ratio
+        downside_returns =  port["Portfolio"][port["Portfolio"] < float(rp)]
+        down_stdev = np.sqrt(sum((downside_returns - float(rp))**2)/len(port["Portfolio"])) * np.sqrt(252)
+        
+        sortino_ratio = round((rp - float(rf)) / down_stdev, 2)
+            
+        st.subheader("Portfolio Performance Summary")
+        st.dataframe(pd.DataFrame({"Portfolio CAGR, %" : cagr_portfolio,
+                                  "Benchmark CAGR, %" : cagr_benchmark,
+                                  "Tracking Error, %" : tracking_err,
+                                  "Max Drawdown, %" : mdd,
+                                  "Sharpe Ratio" : sharpe_ratio,
+                                  "Sortino Ratio" : sortino_ratio
+                                  }, index=["Metrics"]))
+        
+    except Exception as error:
+        st.text("Error found: {}".format(error))
 
-    star_bm_value = benchmark_price_data["CumulativeReturns"][1]
-    end_bm_value = benchmark_price_data["CumulativeReturns"][len(benchmark_price_data["CumulativeReturns"]) - 1]
-
-    cagr_portfolio = round(((end_port_value/star_port_value)**(1/5) - 1) * 100, 2)
-    cagr_benchmark = round(((end_bm_value/star_bm_value)**(1/5) - 1) * 100, 2)
-
-    # The tracking error
-    tracking_err = round((np.std(port["Portfolio"] - benchmark_price_data["R_Benchmark"]) * np.sqrt(252) * 100), 2)
-
-    # Maximum Drawdown (MDD) = (Trough Value – Peak Value) ÷ Peak Value
-    mdd = round(((port["CumulativeReturns"].max() - port["CumulativeReturns"].min()) / port["CumulativeReturns"].max()) * 100, 2)
-
-    # Calculate Sharpe Ratio
-    rp = round(port["Portfolio"].mean()*252, 3)
-    sharpe_ratio = round((rp - float(rf)) / (port["Portfolio"].std()*np.sqrt(252)), 3)
-    
-    # Calculate Sortino Ratio
-    downside_returns =  port["Portfolio"][port["Portfolio"] < float(rp)]
-    down_stdev = np.sqrt(sum((downside_returns - float(rp))**2)/len(port["Portfolio"])) * np.sqrt(252)
-
-    sortino_ratio = round((rp - float(rf)) / down_stdev, 2)
-    
-    st.subheader("Portfolio Performance Summary")
-    st.dataframe(pd.DataFrame({"Portfolio CAGR, %" : cagr_portfolio,
-                  "Benchmark CAGR, %" : cagr_benchmark,
-                  "Tracking Error, %" : tracking_err,
-                  "Max Drawdown, %" : mdd,
-                  "Sharpe Ratio" : sharpe_ratio,
-                  "Sortino Ratio" : sortino_ratio
-                  }, index=["Metrics"]))
-    
     # Define function to compute tracking error:
-    def opt_tracking_error(weights):
-        opt_result =  round((np.std(port[return_col].mul(weights, axis=1).sum(axis=1) - benchmark_price_data["R_Benchmark"]) * np.sqrt(252) * 100), 2)
-        return opt_result
+    try:
+        def opt_tracking_error(weights):
+            opt_result =  round((np.std(port[return_col].mul(weights, axis=1).sum(axis=1) - benchmark_price_data["R_Benchmark"]) * np.sqrt(252) * 100), 2)
+            return opt_result
     
-    # Weight constraint: sum of weights is equal to 1
-    constraint = {"type": "eq", "fun": lambda x: np.sum(x) - 1}
-
-    optimizer = minimize(opt_tracking_error, 
-                        x0=[0.1 for i in range(len(df["Ticker"]))], 
-                        method = "SLSQP", 
-                        bounds = [(0.05, 0.3) for i in range(len(df["Ticker"]))], 
-                        constraints = constraint)
-    
-    st.write("Optimization result for minimum tracking error of portfolio with weight boundary within 0.05 and 0.3 is as follows:")
-    st.dataframe({"Ticker" : list(df["Ticker"]), "Weights": [round(opt_w, 2) for opt_w in optimizer.x]})
+        # Weight constraint: sum of weights is equal to 1
+        constraint = {"type": "eq", "fun": lambda x: np.sum(x) - 1}
+        
+        optimizer = minimize(opt_tracking_error, 
+                             x0=[0.1 for i in range(len(df["Ticker"]))], 
+                             method = "SLSQP", 
+                             bounds = [(0.05, 0.3) for i in range(len(df["Ticker"]))], 
+                             constraints = constraint)
+            
+        st.write("Optimization result for minimum tracking error of portfolio with weight boundary within 0.05 and 0.3 is as follows:")
+        st.dataframe({"Ticker" : list(df["Ticker"]), "Weights": [round(opt_w, 2) for opt_w in optimizer.x]})
+    except Exception as error:
+        st.text("Error found: {}".format(error))
