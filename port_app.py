@@ -147,7 +147,7 @@ if port is not None:
         
         # Calculate Sharpe Ratio
         rp = round(port["Portfolio"].mean()*252, 3)
-        sharpe_ratio = round((rp - float(rf)) / (port["Portfolio"].std()*np.sqrt(252)), 3)
+        sharpe_ratio = round((rp - float(rf)) / (port["Portfolio"].std()*np.sqrt(252)), 2)
             
         # Calculate Sortino Ratio
         downside_returns =  port["Portfolio"][port["Portfolio"] < float(rp)]
