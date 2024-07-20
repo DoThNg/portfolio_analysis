@@ -16,6 +16,8 @@ st.write("""
          
         This app can be used for analysis of a selected equity portfolio over the past 5 years.
 
+        To optimize stock weights (weight boundary within 0.05 and 0.3) for the minimum tracking error of portfolio against the benchmark, the portfolio would contains a number of stocks from 5 to 20.
+
         **Note**: The sidebar on the left of the dashboard app is for the user inputs
          
         **Disclaimer:**
