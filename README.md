@@ -6,7 +6,7 @@ This app is only for learning to build and deploy a Streamlit App. Any informati
 
 This is an interactive Streamlit App built in Python with the stock data deriving from Yahoo Finance. The web application can be found in the following [link](https://equity-portfolio.streamlit.app/)
 
-If the following notification appears, please reactive the application as follows:
+If the following notification appears, please get the application up and running as follows:
 
 ![app](https://github.com/DoThNg/portfolio_analysis/blob/main/streamlit_app.png)
 
