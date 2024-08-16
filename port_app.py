@@ -10,7 +10,7 @@ from dateutil.relativedelta import relativedelta
 
 st.set_page_config(layout="wide", page_title="Portfolio Construction", initial_sidebar_state = "expanded", page_icon=":sparkles:")
 
-st.title("Equity Portfolio Construction :telescope:")
+st.title("Portfolio Performance Analytics :telescope:")
 st.write("""
         This is an interactive dashboard app built in Python with the stock data deriving from Yahoo Finance.
          
