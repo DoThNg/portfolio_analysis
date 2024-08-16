@@ -172,14 +172,14 @@ if port is not None:
     # Define function to compute tracking error:
     try:
         def opt_tracking_error(weights):
-            opt_result =  round((np.std(port[return_col].mul(weights, axis=1).sum(axis=1) - benchmark_price_data["R_Benchmark"]) * np.sqrt(252) * 100), 2)
+            opt_result =  np.sqrt(np.mean((port[return_col].mul(weights, axis=1).sum(axis=1) - benchmark_price_data["R_Benchmark"]) * np.sqrt(252) * 100))
             return opt_result
     
         # Weight constraint: sum of weights is equal to 1
         constraint = {"type": "eq", "fun": lambda x: np.sum(x) - 1}
         
         optimizer = minimize(opt_tracking_error, 
-                             x0=[0.1 for i in range(len(df["Ticker"]))], 
+                             x0 = [np.random.rand() for i in range(len(df["Ticker"]))], 
                              method = "SLSQP", 
                              bounds = [(0.05, 0.3) for i in range(len(df["Ticker"]))], 
                              constraints = constraint)
